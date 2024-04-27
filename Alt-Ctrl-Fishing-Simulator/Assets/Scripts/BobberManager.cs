@@ -17,10 +17,16 @@ public class BobberManager : MonoBehaviour
     public float underwaterDiveSpeed = 3f;
 
     [Header("Reeling Fields")]
-    public float reelSpeed;
+    public float reelInitialSpeed;
+    public float reelSpeedDecreaseRate;
 
-    private GameObject target = null;
+    private float lastReelPress = 0f;
 
+    [SerializeField] private GameObject target = null;
+    public GameObject tempTarget;
+
+
+    private Rigidbody rb;
     private enum BobberState
     {
         uncast,
@@ -38,11 +44,21 @@ public class BobberManager : MonoBehaviour
     private void Start()
     {
         EventManager.Instance.reelButtonPressedEvent.AddListener(ReelPressed);
-        EventManager.Instance.reelButtonReleasedEvent.AddListener(ReelReleased);
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
+        // TEMPORARY
+        if(DEBUG)
+        {
+            if (Input.GetKey(KeyCode.T))
+            {
+                AddTarget(tempTarget);
+            }
+            Debug.Log("Bobber state: " + state + "\nVelocity " + rb.velocity + "\tPosition " + gameObject.transform.position);
+        }
+
         switch (state)
         {
             case BobberState.uncast:
@@ -51,24 +67,33 @@ public class BobberManager : MonoBehaviour
                 if(gameObject.transform.position.y <= floatHeight)
                 {
                     state = BobberState.floating;
-                    gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-                    // TODO: Splash sound and particle here
+                    rb.velocity = Vector3.zero;
+                    rb.useGravity = false;
+                    // TODO: Splash sound and particle here (optional)
                 }
                 break;
             case BobberState.floating:
                 // If floating do a bobbing animation
                 float yOffset = Mathf.Sin(Time.time / floatBobWavelength) * floatBobAmplitude;
+                rb.velocity = Vector3.zero;
 
                 gameObject.transform.position = new Vector3(gameObject.transform.position.x, floatHeight + yOffset, gameObject.transform.position.z);
                 break;
             case BobberState.underwater:
                 if (gameObject.transform.position.y <= underwaterHeight)
                 {
-                    gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    rb.velocity = Vector3.zero;
+                    gameObject.transform.position = new Vector3(gameObject.transform.position.x, underwaterHeight, gameObject.transform.position.z);
                 }
+
                 break;
             case BobberState.reeling:
+                // Handle decceleration
+                Vector3 velocity = rb.velocity;
+                velocity.Normalize();
+                velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), 0f);
+                rb.velocity = velocity;
+
                 break;
             case BobberState.retrieving:
                 break;
@@ -89,24 +114,39 @@ public class BobberManager : MonoBehaviour
             Vector3 velocity = new Vector3();
             float distToTarget = Vector3.Distance(gameObject.transform.position, target.transform.position);
 
-            velocity.x = (distToTarget / (transform.position.x - target.transform.position.x)) * underwaterDiveSpeed;
-            velocity.x = (distToTarget / (transform.position.y - target.transform.position.y)) * underwaterDiveSpeed;
-            velocity.x = (distToTarget / (transform.position.z - target.transform.position.z)) * underwaterDiveSpeed;
+            velocity.x = (target.transform.position.x - transform.position.x);
+            velocity.y = (target.transform.position.y - transform.position.y);
+            velocity.z = (target.transform.position.z - transform.position.z);
 
-            gameObject.GetComponent<Rigidbody>().velocity = velocity;
+            velocity.Normalize();
+            velocity *= underwaterDiveSpeed;
+            rb.velocity = velocity;
+
+            if (DEBUG) { Debug.Log("Diving"); }
+
+
         }
     }
 
     private void ReelPressed()
     {
         // TODO: Fish related stuff
-
+        lastReelPress = Time.time;
         state = BobberState.reeling;
-        gameObject.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, -reelSpeed);
-    }
-    private void ReelReleased()
-    {
-        state = BobberState.floating;
-        gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        Vector3 velocity = Vector3.zero;
+
+        velocity.x = homePosition.position.x - transform.position.x;
+        velocity.y = homePosition.position.y - transform.position.y;
+        velocity.z = homePosition.position.z - transform.position.z;
+
+        velocity.Normalize();
+        velocity *= reelInitialSpeed;
+
+        rb.velocity = velocity;
+
+        if (DEBUG)
+        {
+            Debug.Log("Reel pressed");
+        }
     }
 }

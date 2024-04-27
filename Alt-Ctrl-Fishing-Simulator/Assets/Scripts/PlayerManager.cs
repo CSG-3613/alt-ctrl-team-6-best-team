@@ -10,6 +10,23 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    #region Singleton
+    private static PlayerManager instance;
+    public static PlayerManager Instance { get { return instance; } }
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Debug.LogError("Duplicate EventManager found in scene");
+            Destroy(this);
+        }
+    }
+    #endregion
+
     public float castTimeLimit = 2f;
     public BobberManager bobber;
     public Transform bobberStartingPosition;
@@ -30,12 +47,12 @@ public class PlayerManager : MonoBehaviour
         eventManager.castButtonPressedEvent.AddListener(CastPressed);
         eventManager.castButtonReleasedEvent.AddListener(CastReleased);
         bobber.gameObject.SetActive(false);
-        // isCast = false;
+        isCast = false;
     }
 
     private void CastPressed()
     {
-        //if(isCast) { return; }
+        if(isCast) { return; }
 
         Debug.Log("pressed cast button");
         timeCastPressed = Time.time;
