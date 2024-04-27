@@ -216,6 +216,37 @@ Transform:
   - {fileID: 1084101330}
   m_Father: {fileID: 1991234663}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &219010408
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 219010409}
+  m_Layer: 0
+  m_Name: TempTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &219010409
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219010408}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.58, y: -3.32, z: 13.55}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &297874133
 GameObject:
   m_ObjectHideFlags: 0
@@ -971,15 +1002,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c98e2faeb97b845a7f1c00dc3bb5b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homePosition: {fileID: 0}
+  homePosition: {fileID: 548743147}
   floatHeight: 0
   floatBobWavelength: 0.5
   floatBobAmplitude: 0.05
   underwaterHeight: -1
   underwaterDiveSpeed: 3
-  reelSpeed: 0
+  reelInitialSpeed: 3
+  reelSpeedDecreaseRate: 1
+  target: {fileID: 0}
+  tempTarget: {fileID: 219010408}
   state: 0
-  DEBUG: 0
+  DEBUG: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -991,3 +1025,4 @@ SceneRoots:
   - {fileID: 548743147}
   - {fileID: 1819273441}
   - {fileID: 1991234663}
+  - {fileID: 219010409}
