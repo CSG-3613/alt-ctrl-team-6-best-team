@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering.Universal.Internal;
 using UnityEngine.tvOS;
 using WiimoteApi;
 
@@ -13,7 +14,7 @@ public class EventManager : MonoBehaviour
 {
     #region Singleton
     private static EventManager instance;
-    public static EventManager Instance {  get { return instance; } }
+    public static EventManager Instance { get { return instance; } }
     private void Awake()
     {
         if (instance == null)
@@ -40,7 +41,9 @@ public class EventManager : MonoBehaviour
     public UnityEvent reelButtonReleasedEvent = new UnityEvent();
     private bool isReeling = false;
 
-    public static Wiimote wiimote;
+    public bool DEBUG = false;
+
+    [HideInInspector] public static Wiimote wiimote;
 
     private void Start()
     {
@@ -66,6 +69,11 @@ public class EventManager : MonoBehaviour
             if (wiimote == null) { wiimote = remote; }
             Debug.Log("Found Wiimote: " + remote.ToString());
             remote.SendPlayerLED(true, false, false, false);
+
+            wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_ACCEL);
+
+            wiimote.ReadWiimoteData();
+            Debug.LogWarning(wiimote.Status.battery_level);
         }
 
         Debug.Log("Wiimote = " + wiimote.ToString());
@@ -88,8 +96,21 @@ public class EventManager : MonoBehaviour
             ret = wiimote.ReadWiimoteData();
         } while (ret > 0); // ReadWiimoteData() returns 0 when nothing is left to read.  So by doing this we continue to
                            // update the Wiimote until it is "up to date."
-        
-        
+
+        if (DEBUG)
+        {
+            float[] accelData = wiimote.Accel.GetCalibratedAccelData();
+
+            float accel_x = accelData[0];
+            float accel_y = accelData[2];
+            float accel_z = accelData[1];
+
+            if (wiimote.Button.minus)
+            {
+                Debug.Log("Wiimote accel: " + accel_x + ", " + accel_y + ", " + accel_z);
+            }
+        }
+
 
         if (!isCasting && (Input.GetKeyDown(castKeycode) || wiimote.Button.a))
         {
@@ -107,13 +128,13 @@ public class EventManager : MonoBehaviour
             wiimote.RumbleOn = false;
             wiimote.SendStatusInfoRequest();
         }
-        
-        if (!isReeling && Input.GetKeyDown(reelKeycode))
+
+        if (!isReeling && Input.GetKeyDown(reelKeycode) || wiimote.Button.b)
         {
             reelButtonPressedEvent.Invoke();
             isReeling = true;
         } 
-        if (isReeling && Input.GetKeyUp(reelKeycode))
+        if (isReeling && Input.GetKeyUp(reelKeycode) || !wiimote.Button.b)
         {
             reelButtonReleasedEvent.Invoke();
             isReeling = false;

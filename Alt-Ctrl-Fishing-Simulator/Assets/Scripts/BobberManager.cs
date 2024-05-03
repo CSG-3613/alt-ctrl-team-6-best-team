@@ -8,6 +8,10 @@ public class BobberManager : MonoBehaviour
 {
     public Transform homePosition;
 
+    [Header("Casting Fields")]
+    public float castYMultiplier = 1.2f;
+    public float castZMultiplier = 2.0f;
+
     [Header("Floating Fields")]
     public float floatHeight = 0f;
     public float floatBobWavelength = 1f;
@@ -59,7 +63,7 @@ public class BobberManager : MonoBehaviour
             {
                 AddTarget(tempTarget);
             }
-            Debug.Log("Bobber state: " + state + "\nVelocity " + rb.velocity + "\tPosition " + gameObject.transform.position);
+            //Debug.Log("Bobber state: " + state + "\nVelocity " + rb.velocity + "\tPosition " + gameObject.transform.position);
         }
 
         switch (state)
@@ -92,8 +96,12 @@ public class BobberManager : MonoBehaviour
                 break;
             case BobberState.reeling:
                 // Handle decceleration
+                if(Time.time <= (lastReelPress + .05f)) { return; }
                 Vector3 velocity = rb.velocity;
                 velocity.Normalize();
+
+                if(transform.position.y >= floatHeight) { velocity.y = 0; }
+
                 velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), -reelMaxNegativeSpeed);
                 rb.velocity = velocity;
 
@@ -105,19 +113,35 @@ public class BobberManager : MonoBehaviour
 
     public void Cast()
     {
-        AccelData accel = EventManager.wiimote.Accel;
-        if (accel != null)
+        rb.useGravity = true;
+        
+        if (EventManager.wiimote != null)
         {
+            AccelData accel = EventManager.wiimote.Accel;
             float[] accelData = accel.GetCalibratedAccelData();       
 
             float accel_x = accelData[0];
-            float accel_y = -accelData[2];
-            float accel_z = -accelData[1];
+            float accel_y = accelData[2];
+            float accel_z = accelData[1];
 
-            if(DEBUG)
+            if (DEBUG)
             {
                 Debug.Log("Wiimote accel: " + accel_x + ", " + accel_y + ", " + accel_z);
             }
+
+            accel_x = Mathf.Clamp(-2f,accel_x,2f);
+            accel_y *= castYMultiplier;
+            accel_y = Mathf.Clamp(0, accel_y,10f);
+            accel_z *= castZMultiplier;
+            accel_z = Mathf.Clamp(1, accel_z, 10f);
+
+            if (DEBUG)
+            {
+                Debug.Log("Casting with velocity: " + accel_x + ", " + accel_y + ", " + accel_z);
+            }
+
+            Vector3 vel = new Vector3(accel_x, accel_y, accel_z);
+            rb.velocity = vel;
         }
         state = BobberState.flying;
     }
@@ -148,6 +172,7 @@ public class BobberManager : MonoBehaviour
     private void ReelPressed()
     {
         // TODO: Fish related stuff
+
         lastReelPress = Time.time;
         state = BobberState.reeling;
         Vector3 velocity = Vector3.zero;
