@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using WiimoteApi;
 
 public class BobberManager : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class BobberManager : MonoBehaviour
     [Header("Reeling Fields")]
     public float reelInitialSpeed;
     public float reelSpeedDecreaseRate;
+    public float reelMaxNegativeSpeed;
 
     private float lastReelPress = 0f;
 
@@ -27,6 +29,7 @@ public class BobberManager : MonoBehaviour
 
 
     private Rigidbody rb;
+
     private enum BobberState
     {
         uncast,
@@ -91,7 +94,7 @@ public class BobberManager : MonoBehaviour
                 // Handle decceleration
                 Vector3 velocity = rb.velocity;
                 velocity.Normalize();
-                velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), 0f);
+                velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), -reelMaxNegativeSpeed);
                 rb.velocity = velocity;
 
                 break;
@@ -102,6 +105,20 @@ public class BobberManager : MonoBehaviour
 
     public void Cast()
     {
+        AccelData accel = EventManager.wiimote.Accel;
+        if (accel != null)
+        {
+            float[] accelData = accel.GetCalibratedAccelData();       
+
+            float accel_x = accelData[0];
+            float accel_y = -accelData[2];
+            float accel_z = -accelData[1];
+
+            if(DEBUG)
+            {
+                Debug.Log("Wiimote accel: " + accel_x + ", " + accel_y + ", " + accel_z);
+            }
+        }
         state = BobberState.flying;
     }
 

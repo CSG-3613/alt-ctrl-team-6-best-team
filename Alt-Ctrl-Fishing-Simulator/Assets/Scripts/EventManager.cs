@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.tvOS;
+using WiimoteApi;
 
 public class EventManager : MonoBehaviour
 {
@@ -38,28 +40,72 @@ public class EventManager : MonoBehaviour
     public UnityEvent reelButtonReleasedEvent = new UnityEvent();
     private bool isReeling = false;
 
+    public static Wiimote wiimote;
+
     private void Start()
     {
         isCasting = false;
         isReeling = false;
+        InitWiimotes();
     }
+
+    private void OnDestroy()
+    {
+        Debug.Log("Calling FinishedWithWiimote()");
+        FinishedWithWiimotes();
+    }
+
+
+    #region Wiimote stuff
+    void InitWiimotes()
+    {
+        WiimoteManager.FindWiimotes(); // Poll native bluetooth drivers to find Wiimotes
+        wiimote = null;
+        foreach (Wiimote remote in WiimoteManager.Wiimotes)
+        {
+            if (wiimote == null) { wiimote = remote; }
+            Debug.Log("Found Wiimote: " + remote.ToString());
+            remote.SendPlayerLED(true, false, false, false);
+        }
+
+        Debug.Log("Wiimote = " + wiimote.ToString());
+    }
+
+    void FinishedWithWiimotes()
+    {
+        WiimoteManager.Cleanup(wiimote);
+    }
+    #endregion
 
     // Update is called once per frame
     void Update()
     {
-        // TODO: Edit this to be based on wiimote accelerometers (may be handled in the PlayerManager)
 
-        if(!isCasting && Input.GetKeyDown(castKeycode))
+        // this loop taken from the wiimote API docs
+        int ret;
+        do
+        {
+            ret = wiimote.ReadWiimoteData();
+        } while (ret > 0); // ReadWiimoteData() returns 0 when nothing is left to read.  So by doing this we continue to
+                           // update the Wiimote until it is "up to date."
+        
+        
+
+        if (!isCasting && (Input.GetKeyDown(castKeycode) || wiimote.Button.a))
         {
             Debug.Log("CastButtonPressedEvent invoked");
             castButtonPressedEvent.Invoke();
             isCasting = true;
+            wiimote.RumbleOn = true;
+            wiimote.SendStatusInfoRequest();
         }
-        if (isCasting && Input.GetKeyUp(castKeycode))
+        if (isCasting && (Input.GetKeyUp(castKeycode) || !wiimote.Button.a))
         {
             Debug.Log("CastButtonReleasedEvent invoked");
             castButtonReleasedEvent.Invoke();
             isCasting = false;
+            wiimote.RumbleOn = false;
+            wiimote.SendStatusInfoRequest();
         }
         
         if (!isReeling && Input.GetKeyDown(reelKeycode))

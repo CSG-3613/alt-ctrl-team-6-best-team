@@ -1008,8 +1008,9 @@ MonoBehaviour:
   floatBobAmplitude: 0.05
   underwaterHeight: -1
   underwaterDiveSpeed: 3
-  reelInitialSpeed: 3
-  reelSpeedDecreaseRate: 1
+  reelInitialSpeed: 10
+  reelSpeedDecreaseRate: 60
+  reelMaxNegativeSpeed: 30
   target: {fileID: 0}
   tempTarget: {fileID: 219010408}
   state: 0
