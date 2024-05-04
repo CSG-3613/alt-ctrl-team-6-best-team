@@ -129,12 +129,12 @@ public class EventManager : MonoBehaviour
             wiimote.SendStatusInfoRequest();
         }
 
-        if (!isReeling && Input.GetKeyDown(reelKeycode) || wiimote.Button.b)
+        if (!isReeling && (Input.GetKeyDown(reelKeycode) || wiimote.Button.b))
         {
             reelButtonPressedEvent.Invoke();
             isReeling = true;
         } 
-        if (isReeling && Input.GetKeyUp(reelKeycode) || !wiimote.Button.b)
+        if (isReeling && (Input.GetKeyUp(reelKeycode) || !wiimote.Button.b))
         {
             reelButtonReleasedEvent.Invoke();
             isReeling = false;

@@ -34,7 +34,7 @@ public class BobberManager : MonoBehaviour
 
     private Rigidbody rb;
 
-    private enum BobberState
+    public enum BobberState
     {
         uncast,
         flying,
@@ -46,6 +46,8 @@ public class BobberManager : MonoBehaviour
 
     [Header("Debug Fields")]
     [SerializeField] private BobberState state;
+    public BobberState State { get { return state; } }
+
     [SerializeField] private bool DEBUG = false;
 
     private void Start()
@@ -63,6 +65,7 @@ public class BobberManager : MonoBehaviour
             {
                 AddTarget(tempTarget);
             }
+
             //Debug.Log("Bobber state: " + state + "\nVelocity " + rb.velocity + "\tPosition " + gameObject.transform.position);
         }
 
@@ -96,13 +99,18 @@ public class BobberManager : MonoBehaviour
                 break;
             case BobberState.reeling:
                 // Handle decceleration
-                if(Time.time <= (lastReelPress + .05f)) { return; }
-                Vector3 velocity = rb.velocity;
+                if((Time.time <= (lastReelPress + .05f)) || target == null) { return; }
+                Vector3 velocity = homePosition.position - gameObject.transform.position;
+                // TODO: base directions on target rather than gameObject (won't work until i have a fish that swims away)
                 velocity.Normalize();
 
-                if(transform.position.y >= floatHeight) { velocity.y = 0; }
+                if(transform.position.y >= floatHeight) { 
+                    velocity.y = 0; 
+                    gameObject.transform.position = new Vector3(gameObject.transform.position.x, floatHeight, gameObject.transform.position.z);
+                }
 
-                velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), -reelMaxNegativeSpeed);
+                velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), reelMaxNegativeSpeed);
+                if(DEBUG) { Debug.Log("Reeling with velocity " + velocity); }
                 rb.velocity = velocity;
 
                 break;
@@ -190,5 +198,18 @@ public class BobberManager : MonoBehaviour
         {
             Debug.Log("Reel pressed");
         }
+    }
+
+    public GameObject Retrieve()
+    {
+        state = BobberState.retrieving;
+        gameObject.transform.position = homePosition.position;
+        return target;
+    }
+
+    public void Reset()
+    {
+        state = BobberState.uncast;
+        target = null;
     }
 }

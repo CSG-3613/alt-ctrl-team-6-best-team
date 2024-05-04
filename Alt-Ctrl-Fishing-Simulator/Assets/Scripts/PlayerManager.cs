@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
@@ -31,10 +32,19 @@ public class PlayerManager : MonoBehaviour
     public BobberManager bobber;
     public Transform bobberStartingPosition;
 
+    [Header("Fish Display Menu")]
+    public Transform fishDisplayTransform;
+    public float fishTurnSpeed;
+    private bool isInFishMenu = false;
+
     private bool isCast = false;
     private bool isReeling = false;
 
+    private GameObject fish = null;
+
     private EventManager eventManager;
+
+
 
     private void Start()
     {
@@ -43,6 +53,14 @@ public class PlayerManager : MonoBehaviour
         eventManager.castButtonReleasedEvent.AddListener(CastReleased);
         bobber.gameObject.SetActive(false);
         isCast = false;
+    }
+
+    private void Update()
+    {
+        if (isInFishMenu)
+        {
+            fish.transform.Rotate(0, fishTurnSpeed, 0);
+        }
     }
 
     private void CastPressed()
@@ -69,4 +87,55 @@ public class PlayerManager : MonoBehaviour
         //rb.useGravity = true;
         bobber.Cast();
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "Bobber")
+        {
+            Debug.Log("Bobber " + other.gameObject.name + " entered retrieval zone");
+            BobberManager bm = other.gameObject.GetComponent<BobberManager>();
+            if(bm != null && bm.State == BobberManager.BobberState.reeling)
+            {
+                fish = bm.Retrieve();
+                if(fish == null)
+                {
+                    bm.Reset();
+                    ResetGamestate();
+                }
+                else
+                {
+                    EnterFishDisplay();
+                }
+            }
+        }
+    }
+
+    private void EnterFishDisplay()
+    {
+        isInFishMenu = true;
+        fish.transform.position = fishDisplayTransform.position;
+        fish.transform.rotation = fishDisplayTransform.rotation;
+        Collider col = fish.GetComponent<Collider>();
+        if(col != null)
+        {
+            col.enabled = false;
+        }
+        bobber.gameObject.SetActive(false);
+        EventManager.Instance.castButtonReleasedEvent.AddListener(ResetGamestate);
+    }
+
+    private void ResetGamestate()
+    {
+        isCast = false;
+        isReeling = false;
+        fish.SetActive(false);
+        fish = null;
+        if (isInFishMenu)
+        {
+            EventManager.Instance.castButtonReleasedEvent.RemoveListener(ResetGamestate);
+            isInFishMenu = false;
+        }
+        bobber.gameObject.SetActive(false);
+    }
+
 }
