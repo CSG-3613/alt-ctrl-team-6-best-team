@@ -99,7 +99,11 @@ public class BobberManager : MonoBehaviour
                 break;
             case BobberState.reeling:
                 // Handle decceleration
-                if((Time.time <= (lastReelPress + .005f)) || target == null) { return; }
+                if(Time.time <= (lastReelPress + .005f)) { return; }
+                else if((Time.time-lastReelPress) > 1f && target == null)
+                {
+                    state = BobberState.floating;
+                }
                 Vector3 velocity = homePosition.position - gameObject.transform.position;
                 // TODO: base directions on target rather than gameObject (won't work until i have a fish that swims away)
                 velocity.Normalize();
@@ -109,7 +113,15 @@ public class BobberManager : MonoBehaviour
                     gameObject.transform.position = new Vector3(gameObject.transform.position.x, floatHeight, gameObject.transform.position.z);
                 }
 
-                velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), reelMaxNegativeSpeed);
+                if(target == null)
+                {
+                    velocity *= Mathf.Max(reelInitialSpeed - (.5f *  reelSpeedDecreaseRate * (Time.time - lastReelPress)), 0f);
+                }
+                else
+                {
+                    velocity *= Mathf.Max(reelInitialSpeed - (reelSpeedDecreaseRate * (Time.time - lastReelPress)), reelMaxNegativeSpeed);
+                }
+                
                 if(DEBUG) { Debug.Log("Reeling with velocity " + velocity); }
                 rb.velocity = velocity;
 

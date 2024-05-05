@@ -33,12 +33,13 @@ public class PlayerManager : MonoBehaviour
     public Transform bobberStartingPosition;
 
     [Header("Fish Display Menu")]
+    public Canvas fishDisplayCanvas;
     public Transform fishDisplayTransform;
     public float fishTurnSpeed;
     private bool isInFishMenu = false;
 
     private bool isCast = false;
-    private bool isReeling = false;
+    // private bool isReeling = false;
 
     private GameObject fish = null;
 
@@ -53,6 +54,7 @@ public class PlayerManager : MonoBehaviour
         eventManager.castButtonReleasedEvent.AddListener(CastReleased);
         bobber.gameObject.SetActive(false);
         isCast = false;
+        fishDisplayCanvas.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -70,21 +72,15 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("pressed cast button");
         bobber.gameObject.SetActive(true);
         bobber.gameObject.GetComponent<Rigidbody>().useGravity = false;
+        EventManager.wiimote.RumbleOn = true;
     }
 
     private void CastReleased()
     {
         if(isCast) { return; }
         isCast = true;
+        EventManager.wiimote.RumbleOn = false;
 
-        //// TODO: Get acceleration vector from wiimote here and use it to generate bobber velocity
-        //float timeSinceCastPressed = math.max(Time.time - timeCastPressed, castTimeLimit);
-        //Rigidbody rb = bobber.gameObject.GetComponent<Rigidbody>();
-
-        //Vector3 bobberVelocity = new Vector3(0f, timeSinceCastPressed * bobberVerticalForceMultiplier, timeSinceCastPressed * bobberHorizontalForceMultiplier);
-        //Debug.Log("Launching bobber with velocity vector " + bobberVelocity);
-        //rb.velocity = bobberVelocity;
-        //rb.useGravity = true;
         bobber.Cast();
     }
 
@@ -97,6 +93,7 @@ public class PlayerManager : MonoBehaviour
             if(bm != null && bm.State == BobberManager.BobberState.reeling)
             {
                 fish = bm.Retrieve();
+                fishDisplayCanvas.gameObject.SetActive(true);
                 if(fish == null)
                 {
                     bm.Reset();
@@ -126,15 +123,20 @@ public class PlayerManager : MonoBehaviour
 
     private void ResetGamestate()
     {
+        fishDisplayCanvas.gameObject.SetActive(false);
         isCast = false;
-        isReeling = false;
-        fish.SetActive(false);
-        fish = null;
+        // isReeling = false;
+        if(fish != null)
+        {
+            fish.SetActive(false);
+            fish = null;
+        }
         if (isInFishMenu)
         {
             EventManager.Instance.castButtonReleasedEvent.RemoveListener(ResetGamestate);
             isInFishMenu = false;
         }
+        bobber.Reset();
         bobber.gameObject.SetActive(false);
     }
 

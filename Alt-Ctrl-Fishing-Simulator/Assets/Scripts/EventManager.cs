@@ -117,7 +117,7 @@ public class EventManager : MonoBehaviour
             Debug.Log("CastButtonPressedEvent invoked");
             castButtonPressedEvent.Invoke();
             isCasting = true;
-            wiimote.RumbleOn = true;
+            
             wiimote.SendStatusInfoRequest();
         }
         if (isCasting && (Input.GetKeyUp(castKeycode) || !wiimote.Button.a))
@@ -125,7 +125,7 @@ public class EventManager : MonoBehaviour
             Debug.Log("CastButtonReleasedEvent invoked");
             castButtonReleasedEvent.Invoke();
             isCasting = false;
-            wiimote.RumbleOn = false;
+            
             wiimote.SendStatusInfoRequest();
         }
 
