@@ -1182,7 +1182,7 @@ MonoBehaviour:
   underwaterDiveSpeed: 3
   reelInitialSpeed: 10
   reelSpeedDecreaseRate: 60
-  reelMaxNegativeSpeed: -15
+  reelMaxNegativeSpeed: -7
   target: {fileID: 0}
   tempTarget: {fileID: 1334892486}
   state: 0

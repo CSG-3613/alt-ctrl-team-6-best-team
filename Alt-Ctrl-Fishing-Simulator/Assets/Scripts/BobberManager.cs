@@ -99,7 +99,7 @@ public class BobberManager : MonoBehaviour
                 break;
             case BobberState.reeling:
                 // Handle decceleration
-                if((Time.time <= (lastReelPress + .05f)) || target == null) { return; }
+                if((Time.time <= (lastReelPress + .005f)) || target == null) { return; }
                 Vector3 velocity = homePosition.position - gameObject.transform.position;
                 // TODO: base directions on target rather than gameObject (won't work until i have a fish that swims away)
                 velocity.Normalize();
@@ -137,11 +137,11 @@ public class BobberManager : MonoBehaviour
                 Debug.Log("Wiimote accel: " + accel_x + ", " + accel_y + ", " + accel_z);
             }
 
-            accel_x = Mathf.Clamp(-2f,accel_x,2f);
+            accel_x = Mathf.Clamp(-5f,accel_x,5f);
             accel_y *= castYMultiplier;
-            accel_y = Mathf.Clamp(0, accel_y,10f);
+            accel_y = Mathf.Clamp(2, accel_y,10f);
             accel_z *= castZMultiplier;
-            accel_z = Mathf.Clamp(1, accel_z, 10f);
+            accel_z = Mathf.Clamp(3, accel_z, 10f);
 
             if (DEBUG)
             {
@@ -204,12 +204,17 @@ public class BobberManager : MonoBehaviour
     {
         state = BobberState.retrieving;
         gameObject.transform.position = homePosition.position;
+        rb.velocity = Vector3.zero;
         return target;
     }
 
     public void Reset()
     {
         state = BobberState.uncast;
-        target = null;
+        if(target != null)
+        {
+            target = null;
+        }
+        
     }
 }
