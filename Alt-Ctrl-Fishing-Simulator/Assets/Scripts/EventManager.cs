@@ -49,16 +49,16 @@ public class EventManager : MonoBehaviour
     {
         isCasting = false;
         isReeling = false;
-        InitWiimotes();
+        //InitWiimotes();
     }
 
     private void OnDestroy()
     {
         Debug.Log("Calling FinishedWithWiimote()");
-        FinishedWithWiimotes();
+        //FinishedWithWiimotes();
     }
 
-
+    /**
     #region Wiimote stuff
     void InitWiimotes()
     {
@@ -79,22 +79,24 @@ public class EventManager : MonoBehaviour
         Debug.Log("Wiimote = " + wiimote.ToString());
     }
 
-    void FinishedWithWiimotes()
-    {
-        WiimoteManager.Cleanup(wiimote);
-    }
+    //void FinishedWithWiimotes()
+    //{
+        //WiimoteManager.Cleanup(wiimote);
+    //}
     #endregion
+    **/
 
     // Update is called once per frame
     void Update()
     {
 
+        /**
         // this loop taken from the wiimote API docs
-        int ret;
-        do
-        {
-            ret = wiimote.ReadWiimoteData();
-        } while (ret > 0); // ReadWiimoteData() returns 0 when nothing is left to read.  So by doing this we continue to
+        //int ret;
+        //do
+        //{
+            //ret = wiimote.ReadWiimoteData();
+        //} //while (ret > 0); // ReadWiimoteData() returns 0 when nothing is left to read.  So by doing this we continue to
                            // update the Wiimote until it is "up to date."
 
         if (DEBUG)
@@ -110,31 +112,32 @@ public class EventManager : MonoBehaviour
                 Debug.Log("Wiimote accel: " + accel_x + ", " + accel_y + ", " + accel_z);
             }
         }
+        **/
 
 
-        if (!isCasting && (Input.GetKeyDown(castKeycode) || wiimote.Button.a))
+        if (!isCasting && (Input.GetKeyDown(castKeycode) /**|| wiimote.Button.a**/))
         {
             Debug.Log("CastButtonPressedEvent invoked");
             castButtonPressedEvent.Invoke();
             isCasting = true;
             
-            wiimote.SendStatusInfoRequest();
+            //wiimote.SendStatusInfoRequest();
         }
-        if (isCasting && (Input.GetKeyUp(castKeycode) || !wiimote.Button.a))
+        if (isCasting && (Input.GetKeyUp(castKeycode) /**|| !wiimote.Button.a**/))
         {
             Debug.Log("CastButtonReleasedEvent invoked");
             castButtonReleasedEvent.Invoke();
             isCasting = false;
             
-            wiimote.SendStatusInfoRequest();
+            //wiimote.SendStatusInfoRequest();
         }
 
-        if (!isReeling && (Input.GetKeyDown(reelKeycode) || wiimote.Button.b))
+        if (!isReeling && (Input.GetKeyDown(reelKeycode) /**|| wiimote.Button.b**/))
         {
             reelButtonPressedEvent.Invoke();
             isReeling = true;
         } 
-        if (isReeling && (Input.GetKeyUp(reelKeycode) || !wiimote.Button.b))
+        if (isReeling && (Input.GetKeyUp(reelKeycode) /**|| wiimote.Button.b**/))
         {
             reelButtonReleasedEvent.Invoke();
             isReeling = false;

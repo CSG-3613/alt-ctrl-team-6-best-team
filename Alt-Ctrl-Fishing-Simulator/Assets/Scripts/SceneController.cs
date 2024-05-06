@@ -37,7 +37,7 @@ public class SceneController : MonoBehaviour
     private void SpawnBoid(GameObject prefab, int swarmIndex)
     {
         var boidInstance = Instantiate(prefab);
-        boidInstance.transform.localPosition += new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
+        boidInstance.transform.localPosition += new Vector3(Random.Range(-10, 10), -10, Random.Range(-10, 10));
         boidInstance.transform.localRotation = Quaternion.Euler(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
 
         var boidController = boidInstance.GetComponent<BoidController>();

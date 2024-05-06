@@ -163,6 +163,11 @@ public class BobberManager : MonoBehaviour
             Vector3 vel = new Vector3(accel_x, accel_y, accel_z);
             rb.velocity = vel;
         }
+        else if(EventManager.wiimote == null)
+        {
+            Vector3 vel = new Vector3(0, 10, 10);
+            rb.velocity = vel;
+        }
         state = BobberState.flying;
     }
 
