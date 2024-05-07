@@ -1256,9 +1256,6 @@ MonoBehaviour:
   reelButtonPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  reelButtonReleasedEvent:
-    m_PersistentCalls:
-      m_Calls: []
   DEBUG: 1
 --- !u!1001 &964315428
 PrefabInstance:
@@ -2357,9 +2354,9 @@ MonoBehaviour:
   floatBobAmplitude: 0.05
   underwaterHeight: -1
   underwaterDiveSpeed: 3
-  reelInitialSpeed: 10
-  reelSpeedDecreaseRate: 30
-  reelMaxNegativeSpeed: -7
+  reelInitialSpeed: 8
+  reelSpeedDecreaseRate: 45
+  reelMaxNegativeSpeed: -10
   target: {fileID: 0}
   state: 0
   DEBUG: 1
