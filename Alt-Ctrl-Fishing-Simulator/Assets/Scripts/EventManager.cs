@@ -38,17 +38,16 @@ public class EventManager : MonoBehaviour
     // Reeling Fields
     public KeyCode reelKeycode = KeyCode.Mouse1;
     public UnityEvent reelButtonPressedEvent = new UnityEvent();
-    public UnityEvent reelButtonReleasedEvent = new UnityEvent();
-    private bool isReeling = false;
 
     public bool DEBUG = false;
 
     [HideInInspector] public static Wiimote wiimote;
 
+    private bool wasOnePressedLast = false;
+
     private void Start()
     {
         isCasting = false;
-        isReeling = false;
         InitWiimotes();
     }
 
@@ -132,15 +131,10 @@ public class EventManager : MonoBehaviour
             wiimote.SendStatusInfoRequest();
         }
 
-        if (!isReeling && (Input.GetKeyDown(reelKeycode) || wiimote.Button.b))
+        if (Input.GetKeyDown(reelKeycode) || (wasOnePressedLast && wiimote.Button.two) || (!wasOnePressedLast && wiimote.Button.one))
         {
+            if(wiimote.Button.one) { wasOnePressedLast = true; } else { wasOnePressedLast = false; }
             reelButtonPressedEvent.Invoke();
-            isReeling = true;
         } 
-        if (isReeling && (Input.GetKeyUp(reelKeycode) || wiimote.Button.b))
-        {
-            reelButtonReleasedEvent.Invoke();
-            isReeling = false;
-        }
     }
 }

@@ -192,7 +192,14 @@ public class BobberManager : MonoBehaviour
         Vector3 velocity = Vector3.zero;
 
         velocity.x = homePosition.position.x - transform.position.x;
-        velocity.y = homePosition.position.y - transform.position.y;
+        if(transform.position.y >= floatHeight)
+        {
+            velocity.y = homePosition.position.y - transform.position.y;
+        }
+        else
+        {
+            velocity.y = 0;
+        }
         velocity.z = homePosition.position.z - transform.position.z;
 
         velocity.Normalize();
