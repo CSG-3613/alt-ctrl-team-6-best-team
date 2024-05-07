@@ -6,8 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering.Universal.Internal;
-using UnityEngine.tvOS;
 using WiimoteApi;
 
 public class EventManager : MonoBehaviour
@@ -112,7 +110,7 @@ public class EventManager : MonoBehaviour
             }
         }
         
-
+        
 
         if (!isCasting && (Input.GetKeyDown(castKeycode) || wiimote.Button.a))
         {
@@ -136,5 +134,10 @@ public class EventManager : MonoBehaviour
             if(wiimote.Button.one) { wasOnePressedLast = true; } else { wasOnePressedLast = false; }
             reelButtonPressedEvent.Invoke();
         } 
+
+        if(Input.GetKey(KeyCode.Escape) || wiimote.Button.home) 
+        {
+            Application.Quit();
+        }
     }
 }
