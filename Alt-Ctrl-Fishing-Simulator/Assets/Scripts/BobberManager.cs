@@ -29,7 +29,6 @@ public class BobberManager : MonoBehaviour
     private float lastReelPress = 0f;
 
     [SerializeField] private GameObject target = null;
-    public GameObject tempTarget;
 
 
     private Rigidbody rb;
@@ -58,16 +57,6 @@ public class BobberManager : MonoBehaviour
 
     private void Update()
     {
-        // TEMPORARY
-        if(DEBUG)
-        {
-            if (Input.GetKey(KeyCode.T))
-            {
-                AddTarget(tempTarget);
-            }
-
-            //Debug.Log("Bobber state: " + state + "\nVelocity " + rb.velocity + "\tPosition " + gameObject.transform.position);
-        }
 
         switch (state)
         {
@@ -221,6 +210,7 @@ public class BobberManager : MonoBehaviour
     {
         state = BobberState.retrieving;
         gameObject.transform.position = homePosition.position;
+        gameObject.transform.rotation = homePosition.rotation;
         rb.velocity = Vector3.zero;
         return target;
     }

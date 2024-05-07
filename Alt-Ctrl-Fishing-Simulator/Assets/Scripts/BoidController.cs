@@ -10,6 +10,17 @@ public class BoidController : MonoBehaviour
     public float Speed { get; set; }
     public float SteeringSpeed { get; set; }
 
+    public bool reeled = false;
+
+    public BobberManager bobber;
+
+    public void OnTriggerEnter(Collider coll)
+    {
+        if(coll.gameObject.tag == "Bobber")
+        {
+            Reeled();
+        }
+    }
     public void SimulateMovement(List<BoidController> other)
     {
         //default vars
@@ -100,8 +111,13 @@ public class BoidController : MonoBehaviour
         {
             transform.position = new Vector3(transform.position.x, 0, transform.position.z);
         }
+    }
 
-
-
+    public void Reeled()
+    {
+        this.GetComponent<BoxCollider>().enabled = false;
+        reeled = true;
+        bobber.AddTarget(this.gameObject);
+        transform.position = bobber.transform.position;
     }
 }

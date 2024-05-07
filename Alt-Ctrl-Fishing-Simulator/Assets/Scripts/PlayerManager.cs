@@ -39,7 +39,7 @@ public class PlayerManager : MonoBehaviour
     private bool isInFishMenu = false;
 
     private bool isCast = false;
-    private bool isReeling = false;
+    //private bool isReeling = false;
 
     private GameObject fish = null;
 
@@ -72,14 +72,14 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("pressed cast button");
         bobber.gameObject.SetActive(true);
         bobber.gameObject.GetComponent<Rigidbody>().useGravity = false;
-        //EventManager.wiimote.RumbleOn = true;
+        EventManager.wiimote.RumbleOn = true;
     }
 
     private void CastReleased()
     {
         if(isCast) { return; }
         isCast = true;
-        //EventManager.wiimote.RumbleOn = false;
+        EventManager.wiimote.RumbleOn = false;
 
         bobber.Cast();
     }
@@ -125,7 +125,7 @@ public class PlayerManager : MonoBehaviour
     {
         fishDisplayCanvas.gameObject.SetActive(false);
         isCast = false;
-        isReeling = false;
+        //isReeling = false;
         if(fish != null)
         {
             fish.SetActive(false);
