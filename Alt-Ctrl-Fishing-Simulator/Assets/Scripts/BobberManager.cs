@@ -167,7 +167,6 @@ public class BobberManager : MonoBehaviour
             target = newTarget;
             state = BobberState.underwater;
             Vector3 velocity = new Vector3();
-            float distToTarget = Vector3.Distance(gameObject.transform.position, target.transform.position);
 
             velocity.x = (target.transform.position.x - transform.position.x);
             velocity.y = (target.transform.position.y - transform.position.y);
@@ -186,7 +185,7 @@ public class BobberManager : MonoBehaviour
     private void ReelPressed()
     {
         // TODO: Fish related stuff
-
+        if(state != BobberState.floating && state != BobberState.underwater && state != BobberState.reeling) { return; }
         lastReelPress = Time.time;
         state = BobberState.reeling;
         Vector3 velocity = Vector3.zero;

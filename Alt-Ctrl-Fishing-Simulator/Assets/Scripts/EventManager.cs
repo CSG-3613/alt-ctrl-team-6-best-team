@@ -131,7 +131,7 @@ public class EventManager : MonoBehaviour
 
         if (Input.GetKeyDown(reelKeycode) || (wasOnePressedLast && wiimote.Button.two) || (!wasOnePressedLast && wiimote.Button.one))
         {
-            if(wiimote.Button.one) { wasOnePressedLast = true; } else { wasOnePressedLast = false; }
+            if(wiimote.Button.one && !wasOnePressedLast) { wasOnePressedLast = true; } else { wasOnePressedLast = false; }
             reelButtonPressedEvent.Invoke();
         } 
 
